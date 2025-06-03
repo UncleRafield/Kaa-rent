@@ -63,17 +63,37 @@
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
-    function handleSubmit() {
-      const order = {
-        name: document.getElementById("name").value,
-        className: document.getElementById("class").value,
-        item: document.getElementById("item").value,
-        time: document.getElementById("time").value,
-        place: document.getElementById("place").value,
-        notes: document.getElementById("notes").value,
-        timestamp: getFormattedDate(),
-        done: false
-      };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3Yn0-eXEprsXB3Dn4nYTQekGYisoSskqXzpvzUkIKvIYQ66wXuW36xIVOZHnEHrpV_Q/exec"; // Replace with your Apps Script URL
+
+async function handleSubmit() {
+  const order = {
+    name: document.getElementById("name").value,
+    className: document.getElementById("class").value,
+    item: document.getElementById("item").value,
+    time: document.getElementById("time").value,
+    place: document.getElementById("place").value,
+    notes: document.getElementById("notes").value
+  };
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(order),
+      headers: {"Content-Type": "application/json"},
+    });
+    const result = await response.json();
+
+    if (result.result === "success") {
+      alert("✅ Your order has been sent!");
+      document.querySelector("form").reset();
+    } else {
+      alert("⚠️ Failed to send order: " + result.message);
+    }
+  } catch (error) {
+    alert("⚠️ Error sending order: " + error.message);
+  }
+}
+
 
       let orders = JSON.parse(localStorage.getItem("kaaRentals") || "[]");
       orders.push(order);
